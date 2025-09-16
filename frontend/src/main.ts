@@ -1,5 +1,8 @@
 import { createApp } from 'vue'
 import './style/style.css'
 import App from './App.vue'
+import { usePlugins } from "./plugins";
 
-createApp(App).mount('#app')
+const app = createApp(App);
+usePlugins(app);
+app.mount('#app')
