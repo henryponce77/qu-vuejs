@@ -1,6 +1,6 @@
 const express = require('express');
 const LimitingMiddleware = require('limiting-middleware');
-const { types, randomJoke, randomTen, randomSelect, jokeByType, jokeById, count } = require('./handler');
+const { types, getJokes, randomJoke, randomTen, randomSelect, jokeByType, jokeById, count, countByType } = require('./handler');
 
 const app = express();
 
@@ -46,7 +46,7 @@ app.get("/jokes/random/:num", (req, res) => {
     }
   } catch (e) {
     return next(e);
-  } 
+  }
 });
 
 app.get('/jokes/ten', (req, res) => {
@@ -75,6 +75,50 @@ app.get('/jokes/:id', (req, res, next) => {
 app.get('/types', (req, res, next) => {
   res.json(types);
 })
+
+app.get('/total/:type', (req, res, next) => {
+  const jokeType = req.params.type;
+  if (!["all", ...types].includes(jokeType)) {
+    res.send("The passed type is not valid.");
+    return;
+  }
+  res.json(jokeType === "all" ? count : countByType(jokeType));
+})
+
+app.get("/jokes_paginated/:type/:num/:perpage/:direction", (req, res, next) => {
+  let num, perPage, direction, jokeType;
+  try {
+    num = parseInt(req.params.num);
+    if (!num) {
+      res.send("The passed path is not a number.");
+      return;
+    }
+    if (num > count) {
+      res.send(`The passed path exceeds the number of jokes (${count}).`);
+      return;
+    }
+    perPage = parseInt(req.params.perpage);
+    if (perPage <= 0) {
+      res.send("The passed perpage is not a valid number.");
+      return;
+    }
+    direction = req.params.direction;
+    if (direction !== 'asc' && direction !== 'desc') {
+      res.send("The passed direction is not valid. Use 'asc' or 'desc'.");
+      return;
+    }
+
+    jokeType = req.params.type;
+    if (!["all", ...types].includes(jokeType)) {
+      res.send("The passed type is not valid.");
+      return;
+    }
+    res.json(getJokes(num, perPage, direction, jokeType));
+  } catch (e) {
+    return next(e);
+  }
+});
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

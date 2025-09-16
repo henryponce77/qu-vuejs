@@ -28,6 +28,34 @@ const randomN = (jokeArray, n) => {
   });
 };
 
+const countByType = (jokeType) => {
+  const jokes = require('./jokes/index.json');
+  let lastJokeId = 0;
+  jokes.forEach(jk => jk.id = ++lastJokeId);
+  return jokes.filter(joke => joke.type === jokeType).length;
+}
+
+const getJokes = (page, perPage, direction, jokeType) => {
+  const jokes = require('./jokes/index.json');
+  let lastJokeId = 0;
+  jokes.forEach(jk => jk.id = ++lastJokeId);
+
+  const startIndex = (page - 1) * perPage;
+  const endIndex = startIndex + perPage;
+
+  const jokesNew = jokes.slice(startIndex, endIndex) // Create a copy of the array;
+  console.log({ start: startIndex, end: endIndex })
+  if (direction === 'desc') {
+    jokesNew.sort((a, b) => {
+      return b.setup.localeCompare(a.setup); // Using localeCompare for string comparison
+    });
+  }
+  if (jokeType !== 'all') {
+    return jokesNew.filter(joke => joke.type === jokeType);
+  }
+  return jokesNew;
+}
+
 const randomTen = () => randomN(jokes, 10);
 
 const randomSelect = (number) => randomN(jokes, number);
@@ -44,4 +72,4 @@ const count = Object.keys(jokes).length;
  */
 const jokeById = (id) => (jokes.filter(jk => jk.id === id)[0]);
 
-module.exports = { jokes, types, randomJoke, randomN, randomTen, randomSelect, jokeById, jokeByType, count };
+module.exports = { jokes, types, getJokes, randomJoke, randomN, randomTen, randomSelect, jokeById, jokeByType, count, countByType };
