@@ -1,6 +1,13 @@
+## Install dependencies
+* In root folder
+- `npm i`
+* In frontend/ folder
+- `npm i`
+* In backend/ folder
+- `npm i`
+
 ## Run Locally
-* Clone the repo
-* `npm i && npm run dev`
+* `npm run dev`
 
 ## For the frontend
 - Visit `localhost:5173` 
